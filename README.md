@@ -41,8 +41,8 @@ seoulseals-policy-portal/
 │   ├── upload_policy.html      # Policy upload form
 │   ├── manage_policies.html    # Policy management
 │   ├── edit_policy.html        # Policy editing
-│   ├── track_employees.html    # Employee tracking
 │   ├── view_policy.html        # Policy viewing
+│   ├── track_employees.html    # Employee tracking
 │   ├── services.html     # Services overview
 │   ├── features.html     # Features showcase
 │   ├── pricing.html      # Subscription plans
@@ -53,10 +53,9 @@ seoulseals-policy-portal/
 │   ├── help.html         # Help center
 │   ├── privacy.html      # Privacy policy
 │   ├── terms.html        # Terms of service
-│   ├── compliance.html   # Compliance standards
-│   └── superadmin_*.html # Super admin templates
-├── uploads/              # File upload directory
-│   └── policies/         # Policy document storage
+│   └── compliance.html   # Compliance standards
+├── uploads/              # Upload directories
+│   └── policies/         # Policy files (auto-created)
 └── README.md             # This file
 ```
 
@@ -74,7 +73,7 @@ seoulseals-policy-portal/
    cd seoulseals-policy-portal
    ```
 
-2. **Install dependencies:**
+2. **Install Python dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
@@ -88,52 +87,46 @@ seoulseals-policy-portal/
    - Open your browser and go to `http://localhost:5000`
    - The database will be automatically created on first run
 
-### 🎯 Default Super Admin Accounts
+### Super Admin Access
+Two super admin accounts are pre-configured:
+- Email: `vedant.patel@seoulseals.com` | Password: `Ved1427ant@patel%2210`
+- Email: `bharat.bapotra@seoulseals.com` | Password: `Bha1234rat@baporta&0987`
 
-For demonstration purposes, the application creates two super admin accounts:
-
-- **Email:** `vedant.patel@seoulseals.com` | **Password:** `Ved1427ant@patel%2210`
-- **Email:** `bharat.bapotra@seoulseals.com` | **Password:** `Bha1234rat@baporta&0987`
-
-⚠️ **Security Note:** Change these default credentials in production!
+Access super admin panel at: `http://localhost:5000/superadmin/login`
 
 ## 🔗 Available Routes
 
-### Main Navigation
+### Public Pages
 - `/` - Homepage with company information
 - `/services` - Services overview page
 - `/features` - Features showcase page
 - `/pricing` - Subscription plans page
 - `/contact` - Contact information page
-- `/register` - Company registration
-- `/login` - User login
-
-### Super Admin Portal
-- `/superadmin/login` - Super admin login
-- `/superadmin/dashboard` - Super admin dashboard
-- `/superadmin/logout` - Super admin logout
-
-### Company Admin Portal
-- `/admin/dashboard` - Company admin dashboard
-- `/admin/employees/add` - Add new employee
-- `/admin/employees/track` - Track employee progress
-- `/admin/policies` - Manage policies
-- `/admin/policies/upload` - Upload new policy
-- `/admin/policies/<id>/edit` - Edit policy
-- `/admin/policies/<id>/delete` - Delete policy
-
-### Employee Portal
-- `/employee/dashboard` - Employee dashboard
-- `/employee/policy/<id>` - View and acknowledge policy
-- `/employee/acknowledge/<id>` - Policy acknowledgment endpoint
-
-### Information Pages
 - `/security` - Security and compliance information
 - `/docs` - Documentation center
 - `/help` - Help and FAQ
 - `/privacy` - Privacy policy
 - `/terms` - Terms of service
 - `/compliance` - Compliance standards
+
+### Authentication
+- `/register` - Company registration (2-step process)
+- `/login` - User login (admin/employee)
+- `/logout` - User logout
+- `/superadmin/login` - Super admin login
+
+### Admin Dashboard (requires admin login)
+- `/admin/dashboard` - Main admin dashboard
+- `/admin/employees/add` - Add new employee
+- `/admin/policies/upload` - Upload new policy
+- `/admin/policies` - Manage all policies
+- `/admin/policies/<id>/edit` - Edit specific policy
+- `/admin/employees/track` - Track employee progress
+
+### Employee Portal (requires employee login)
+- `/employee/dashboard` - Employee dashboard
+- `/employee/policy/<id>` - View and acknowledge policy
+- `/employee/acknowledge/<id>` - Acknowledge policy (POST)
 
 ## 💾 Database Schema
 
@@ -151,13 +144,13 @@ The application uses SQLite with the following tables:
 - `subscription_plan` - Plan type (starter/professional/enterprise)
 - `created_at` - Registration timestamp
 
-### Users Table
+### Users Table (Admin & Employees)
 - `id` - Primary key
 - `company_id` - Foreign key to companies
 - `email` - Unique email address
 - `password_hash` - Hashed password
-- `first_name` - Employee first name
-- `last_name` - Employee last name
+- `first_name` - First name
+- `last_name` - Last name
 - `role` - User role (admin/employee)
 - `created_at` - Registration timestamp
 
@@ -165,9 +158,9 @@ The application uses SQLite with the following tables:
 - `id` - Primary key
 - `company_id` - Foreign key to companies
 - `title` - Policy title
-- `filename` - Original filename
-- `file_path` - Storage path
-- `content` - Text content
+- `filename` - Original file name
+- `file_path` - Path to uploaded file
+- `content` - Policy content (text)
 - `created_at` - Creation timestamp
 - `updated_at` - Last update timestamp
 
@@ -190,116 +183,131 @@ The application uses SQLite with the following tables:
 ### User Experience
 - Flash messaging system for notifications
 - Progress tracking for policy reading
-- Interactive dashboards with statistics
-- File upload with drag & drop support
 - Real-time form validation
+- Auto-save functionality (where applicable)
+- Intuitive navigation and workflows
 
 ## 🔐 Security Features
 
 - Password hashing with Werkzeug
 - Session management for user authentication
 - Role-based access control
-- SQL injection prevention (parameterized queries)
-- File upload security (type validation)
 - CSRF protection (Flask built-in)
+- SQL injection prevention (parameterized queries)
+- File upload validation and security
+- Secure filename handling
 
 ## 📝 Usage Instructions
 
-### For Companies
+### For Super Admins
+1. Access super admin panel at `/superadmin/login`
+2. Monitor all companies and overall statistics
+3. View company registrations and user activity
 
-1. **Register Your Company:**
-   - Visit the homepage and click "Register Company"
-   - Choose your subscription plan
-   - Fill in company details and admin credentials
+### For Company Registration
+1. Visit `/register` to start registration
+2. Choose subscription plan (Starter/Professional/Enterprise)
+3. Enter company details and admin credentials
+4. Login with admin account to access dashboard
 
-2. **Admin Dashboard:**
-   - Login with admin credentials
-   - Add employees to your system
-   - Upload and manage policies
-   - Track employee acknowledgment progress
-
-3. **Employee Management:**
-   - Add employees with auto-generated emails
-   - Set initial passwords for team members
-   - Monitor completion rates and progress
+### For Company Admins
+1. Login at `/login` with admin credentials
+2. Access admin dashboard to manage:
+   - Add employees to the system
+   - Upload and manage company policies
+   - Track employee policy acknowledgment progress
+   - Edit existing policies and content
 
 ### For Employees
+1. Login at `/login` with employee credentials
+2. View assigned company policies
+3. Read policies in full-screen view
+4. Acknowledge policies after reading
+5. Track personal progress
 
-1. **Access Portal:**
-   - Login with credentials provided by admin
-   - View company policies requiring acknowledgment
-
-2. **Policy Acknowledgment:**
-   - Read policies thoroughly (progress tracked)
-   - Confirm understanding via checkbox
-   - Submit acknowledgment (time tracked)
-
-### For Super Admins
-
-1. **System Management:**
-   - Login via `/superadmin/login`
-   - Monitor all companies and statistics
-   - View system-wide analytics
-
-## 🚀 Deployment
+## 🚀 Deployment Options
 
 ### Local Development
 ```bash
-# Clone and setup
-git clone https://github.com/VedantPatel1427/seoulseals-policy-portal.git
-cd seoulseals-policy-portal
-pip install -r requirements.txt
 python app.py
+# Access at http://localhost:5000
 ```
 
 ### Production Deployment
+For production deployment, consider:
+- Change the `secret_key` in `app.py`
+- Use a production WSGI server (gunicorn, uWSGI)
+- Set up proper database (PostgreSQL, MySQL)
+- Configure reverse proxy (nginx, Apache)
+- Enable HTTPS/SSL
+- Set up file storage (AWS S3, etc.)
 
-1. **Environment Variables:**
-   ```bash
-   export FLASK_ENV=production
-   export SECRET_KEY="your-secure-secret-key-here"
-   ```
+### Environment Variables
+For production, set these environment variables:
+```bash
+export FLASK_ENV=production
+export SECRET_KEY=your-production-secret-key
+export DATABASE_URL=your-database-url
+```
 
-2. **Database:**
-   - For production, consider upgrading to PostgreSQL or MySQL
-   - Update connection strings in `app.py`
+## 📊 Features Highlights
 
-3. **Web Server:**
-   - Use Gunicorn or similar WSGI server
-   - Configure reverse proxy (Nginx)
-   - Enable HTTPS/SSL certificates
+### Admin Features
+- **Employee Management**: Add employees with auto-generated emails
+- **Policy Management**: Upload, edit, and organize company policies
+- **Progress Tracking**: Real-time monitoring of employee compliance
+- **Analytics Dashboard**: Visual statistics and completion rates
+- **File Management**: Support for PDF, DOC, DOCX, and TXT files
+
+### Employee Features
+- **Policy Portal**: Clean interface for viewing company policies
+- **Reading Tracking**: System tracks reading progress and time
+- **Acknowledgment System**: Secure policy acknowledgment workflow
+- **Progress Dashboard**: Personal compliance tracking
+- **Mobile Responsive**: Full functionality on mobile devices
+
+### Enterprise Features
+- **Multi-Company Support**: Isolated company environments
+- **Role-Based Access**: Separate admin and employee interfaces
+- **Audit Trail**: Complete acknowledgment history
+- **Export Capabilities**: CSV export for compliance reporting
+- **Scalable Architecture**: SQLite for development, easily upgradeable
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-## 📜 License
+## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 📞 Support
 
-For questions or support:
+For questions, issues, or support:
+- Create an issue on GitHub
 - Visit `/contact` for contact information
 - Use `/help` for frequently asked questions
-- Check `/docs` for documentation
-- Open an issue on GitHub
+- Check `/docs` for detailed documentation
 
-## 🔄 Version History
+## 🔄 Recent Updates
 
-- **v1.0.0** - Initial release with core functionality
-  - Company registration and management
-  - Policy upload and acknowledgment system
-  - Admin and employee dashboards
-  - Progress tracking and reporting
-  - Responsive design and security features
+- ✅ Complete Flask application with authentication
+- ✅ Admin and employee dashboards
+- ✅ Policy upload and management system
+- ✅ Employee progress tracking
+- ✅ Responsive design for all devices
+- ✅ File upload support for multiple formats
+- ✅ Real-time progress monitoring
+- ✅ Export functionality for compliance
 
 ---
 
 **SeoulSeals** - Streamlining IT & Security Policy Management for Modern Enterprises
 
 🌟 **Star this repository** if you find it useful!
+
+📧 **Contact**: For enterprise inquiries, reach out through the contact page.
